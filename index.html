@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A beautiful, interactive biolink and particle playground.">
+    <title>Zen Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Environment Controls -->
+    <button id="reset-btn" class="top-left-btn"><i class="fa-solid fa-rotate-right"></i> Reset Particles</button>
+    <button id="config-toggle-btn" class="top-right-btn"><i class="fa-solid fa-gear"></i> Particles Config</button>
+
+    <!-- 1. Click to Enter Overlay -->
+    <div id="enter-overlay">
+        <h2 class="pulse-text">[ Click to enter ]</h2>
+    </div>
+
+    <!-- 2. Auth Screen -->
+    <div id="auth-screen" class="hidden">
+        <div class="auth-box glass-panel">
+            <h2>Authentication</h2>
+            <div class="input-group">
+                <input type="text" id="auth-username" class="text-input" placeholder="Username" autocomplete="off">
+            </div>
+            <div class="input-group" id="email-group">
+                <input type="email" id="auth-email" class="text-input" placeholder="Email (for registration)" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <input type="password" id="auth-password" class="text-input" placeholder="Password">
+            </div>
+            <p id="auth-error" class="error-msg"></p>
+            <div class="auth-buttons">
+                <button id="login-btn" class="primary-btn">Login</button>
+                <button id="register-btn" class="secondary-btn">Register</button>
+            </div>
+            <p class="auth-note">Or just <a href="#" id="view-guest-btn">view as guest</a>.</p>
+        </div>
+    </div>
+
+    <!-- 2.5 Email Verification Screen -->
+    <div id="verify-screen" class="hidden overlay-modal" style="background: rgba(0,0,0,0.5);">
+        <div class="auth-box glass-panel" style="max-width: 450px;">
+            <h2>Verify Email</h2>
+            <p style="margin-bottom: 1.5rem; color: rgba(255,255,255,0.7); font-size: 0.95rem; line-height: 1.4;">
+                A verification code has been sent to<br><span id="verify-email-display" style="color:#78ffd6; font-weight: 600;"></span>
+            </p>
+            <div class="input-group">
+                <input type="text" id="verify-code" class="text-input" placeholder="Enter 4-Digit Code" autocomplete="off" style="text-align: center; font-size: 1.2rem; letter-spacing: 5px;">
+            </div>
+            <p id="verify-error" class="error-msg"></p>
+            <div class="auth-buttons">
+                <button id="verify-btn" class="primary-btn">Verify</button>
+                <button id="verify-cancel-btn" class="secondary-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mock Notification Toast -->
+    <div id="mock-email-notification" class="hidden" style="position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: rgba(15, 15, 15, 0.95); border: 1px solid #78ffd6; padding: 15px 25px; border-radius: 12px; z-index: 9999; box-shadow: 0 10px 30px rgba(120, 255, 214, 0.3); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; transition: all 0.4s ease;">
+        <h3 style="color: #78ffd6; margin-bottom: 8px; font-size: 1rem; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-envelope"></i> Mock Email Received</h3>
+        <p style="font-size: 0.95rem; margin-bottom: 0; color: white;">Your verification code is: <strong id="mock-code-display" style="font-size: 1.3rem; letter-spacing: 2px; color: #a8ff78;"></strong></p>
+    </div>
+
+    <!-- 3. Profile Card Layer -->
+    <div id="profile-layer" class="hidden">
+        <div class="profile-card glass-panel">
+            <div class="profile-header">
+                <img id="display-avatar" src="https://api.dicebear.com/9.x/bottts/svg?seed=Zen" alt="Avatar" class="avatar-img">
+                <div class="view-counter"><i class="fa-solid fa-eye"></i> <span id="display-views">1,337</span></div>
+            </div>
+            <h1 id="display-name">Username</h1>
+            <p id="display-bio">Welcome to my little slice of the internet. Move your mouse to interact with the particles.</p>
+            
+            <div class="social-links" id="display-socials">
+                <a href="#" id="link-discord" class="hidden" target="_blank"><i class="fa-brands fa-discord"></i></a>
+                <a href="#" id="link-github" class="hidden" target="_blank"><i class="fa-brands fa-github"></i></a>
+                <a href="#" id="link-twitter" class="hidden" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" id="link-instagram" class="hidden" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" id="link-youtube" class="hidden" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+                <a href="#" id="link-tiktok" class="hidden" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+            </div>
+
+            <!-- Profile Controls -->
+            <div id="owner-controls" class="hidden mt-2">
+                <button id="edit-profile-btn" class="secondary-btn"><i class="fa-solid fa-pen"></i> Edit Profile</button>
+                <button id="logout-btn" class="secondary-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Logout Modal -->
+    <div id="logout-modal" class="hidden overlay-modal">
+        <div class="glass-panel" style="max-width: 350px;">
+            <h2 style="margin-bottom: 1rem; background: linear-gradient(135deg, #ff7878 0%, #ff8e5e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Are you sure?</h2>
+            <p style="margin-bottom: 1.5rem; color: rgba(255,255,255,0.7);">Do you really want to log out?</p>
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button id="confirm-logout-yes" class="primary-btn" style="background: rgba(255, 94, 94, 0.2); border-color: rgba(255, 94, 94, 0.4);">Yes, Log Out</button>
+                <button id="confirm-logout-no" class="secondary-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Edit Profile Drawer -->
+    <div id="edit-profile-panel" class="drawer">
+        <h2>Edit Profile</h2>
+        <div class="setting-group">
+            <label for="edit-display-name">Display Name</label>
+            <input type="text" id="edit-display-name" class="text-input" placeholder="Your name">
+        </div>
+        <div class="setting-group">
+            <label for="edit-avatar">Avatar URL</label>
+            <input type="text" id="edit-avatar" class="text-input" placeholder="Image URL">
+        </div>
+        <div class="setting-group">
+            <label for="edit-bio">Bio</label>
+            <textarea id="edit-bio" class="text-input" rows="3" placeholder="A short bio..."></textarea>
+        </div>
+        
+        <details class="advanced-settings">
+            <summary>Social Links</summary>
+            <div class="setting-group mt-2">
+                <label for="edit-discord">Discord URL</label>
+                <input type="text" id="edit-discord" class="text-input" placeholder="Discord URL">
+            </div>
+            <div class="setting-group">
+                <label for="edit-github">GitHub URL</label>
+                <input type="text" id="edit-github" class="text-input" placeholder="GitHub URL">
+            </div>
+            <div class="setting-group">
+                <label for="edit-twitter">Twitter URL</label>
+                <input type="text" id="edit-twitter" class="text-input" placeholder="Twitter URL">
+            </div>
+            <div class="setting-group">
+                <label for="edit-instagram">Instagram URL</label>
+                <input type="text" id="edit-instagram" class="text-input" placeholder="Instagram URL">
+            </div>
+            <div class="setting-group">
+                <label for="edit-youtube">YouTube URL</label>
+                <input type="text" id="edit-youtube" class="text-input" placeholder="YouTube URL">
+            </div>
+            <div class="setting-group">
+                <label for="edit-tiktok">TikTok URL</label>
+                <input type="text" id="edit-tiktok" class="text-input" placeholder="TikTok URL">
+            </div>
+        </details>
+        
+        <button id="save-profile-btn" class="primary-btn mt-2">Save Profile</button>
+        <button id="close-profile-btn" class="secondary-btn mt-2">Close</button>
+    </div>
+    
+    <!-- 5. Particle Config Drawer -->
+    <div id="config-panel" class="drawer">
+        <h2>Configuration</h2>
+        <div class="setting-group">
+            <label for="particle-count">Particle Count (<span id="count-val">250</span>)</label>
+            <input type="range" id="particle-count" min="50" max="600" value="250">
+        </div>
+        <div class="setting-group">
+            <label for="connect-dist">Connect Distance (<span id="dist-val">12000</span>)</label>
+            <input type="range" id="connect-dist" min="5000" max="40000" value="12000">
+        </div>
+        <div class="setting-group">
+            <label for="mouse-radius">Mouse Radius (<span id="radius-val">180</span>)</label>
+            <input type="range" id="mouse-radius" min="50" max="400" value="180">
+        </div>
+        <div class="setting-group">
+            <label for="trail-opacity">Trail Opacity (<span id="trail-val">0.25</span>)</label>
+            <input type="range" id="trail-opacity" min="0.05" max="1" step="0.05" value="0.25">
+        </div>
+        <div class="setting-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="auto-hue" checked>
+                Auto Color Shift
+            </label>
+        </div>
+        <div class="setting-group" id="manual-hue-group" style="opacity: 0.5; pointer-events: none;">
+            <label for="base-hue">Base Hue (<span id="hue-val">0</span>)</label>
+            <input type="range" id="base-hue" min="0" max="360" value="0">
+        </div>
+
+        <details class="advanced-settings">
+            <summary>Advanced Settings</summary>
+            <div class="setting-group mt-2">
+                <label for="particle-speed">Base Speed (<span id="speed-val">1.0</span>x)</label>
+                <input type="range" id="particle-speed" min="0.1" max="5.0" step="0.1" value="1.0">
+            </div>
+            <div class="setting-group">
+                <label for="burst-force">Burst Force (<span id="burst-val">2.0</span>x)</label>
+                <input type="range" id="burst-force" min="0.5" max="10.0" step="0.5" value="2.0">
+            </div>
+            <div class="setting-group">
+                <label for="particle-size">Max Size (<span id="size-val">3</span>px)</label>
+                <input type="range" id="particle-size" min="1" max="15" value="3">
+            </div>
+            <div class="setting-group">
+                <label for="depth-intensity">Depth Factor (<span id="depth-val">1.5</span>x)</label>
+                <input type="range" id="depth-intensity" min="0" max="5.0" step="0.1" value="1.5">
+            </div>
+        </details>
+
+        <button id="apply-config-btn" class="primary-btn mt-2">Apply Changes</button>
+        <button id="close-config-btn" class="secondary-btn mt-2">Close</button>
+    </div>
+
+    <canvas id="particle-canvas"></canvas>
+    <script src="script.js"></script>
+</body>
+</html>
