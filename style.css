@@ -1,0 +1,385 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #050505;
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    cursor: crosshair; /* Guns.lol style cursor */
+}
+
+/* Utilities */
+.hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    transform: scale(0.95);
+}
+
+.mt-2 {
+    margin-top: 1rem !important;
+}
+
+/* Base Canvas */
+#particle-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: auto;
+}
+
+/* Buttons */
+button {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.75rem 1.5rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -10px rgba(120, 255, 214, 0.3);
+    border-color: rgba(120, 255, 214, 0.5);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, rgba(168, 255, 120, 0.15) 0%, rgba(120, 255, 214, 0.15) 100%);
+    border-color: rgba(120, 255, 214, 0.4);
+    width: 100%;
+}
+
+.primary-btn:hover {
+    background: linear-gradient(135deg, rgba(168, 255, 120, 0.3) 0%, rgba(120, 255, 214, 0.3) 100%);
+    border-color: #78ffd6;
+    box-shadow: 0 0 15px rgba(120, 255, 214, 0.4);
+}
+
+.secondary-btn {
+    background: rgba(255, 255, 255, 0.05);
+    width: 100%;
+}
+
+/* Inputs */
+.text-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.text-input:focus {
+    border-color: #78ffd6;
+    box-shadow: 0 0 10px rgba(120, 255, 214, 0.2);
+}
+
+/* 1. Click to Enter Overlay */
+#enter-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #000000;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+    cursor: pointer;
+}
+
+.pulse-text {
+    font-weight: 300;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    animation: pulse 2s infinite;
+    user-select: none;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.4; text-shadow: 0 0 0px rgba(255,255,255,0); }
+    50% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,0.8); }
+    100% { opacity: 0.4; text-shadow: 0 0 0px rgba(255,255,255,0); }
+}
+
+/* 2. & 3. Glass Panels (Auth & Profile) */
+#auth-screen, #profile-layer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.glass-panel {
+    width: 100%;
+    background: rgba(15, 15, 15, 0.4);
+    border-radius: 24px;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    padding: 2.5rem;
+    text-align: center;
+}
+
+/* Auth Specifics */
+.auth-box h2 {
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 1rem;
+    width: 100%;
+}
+.auth-buttons button {
+    flex: 1;
+}
+
+.auth-note {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+.auth-note a {
+    color: #78ffd6;
+    text-decoration: none;
+}
+.auth-note a:hover {
+    text-decoration: underline;
+}
+.error-msg {
+    color: #ff5e5e;
+    font-size: 0.85rem;
+    margin-top: -0.5rem;
+    min-height: 1rem;
+}
+
+/* Profile Specifics */
+.profile-header {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+
+.avatar-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 30px rgba(120, 255, 214, 0.2);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.avatar-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(120, 255, 214, 0.5);
+    border-color: rgba(120, 255, 214, 0.6);
+}
+
+.view-counter {
+    position: absolute;
+    bottom: 0;
+    right: -10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    backdrop-filter: blur(5px);
+}
+
+#display-name {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+#display-bio {
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 1.5rem;
+}
+
+.social-links a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 1.2rem;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    color: #78ffd6;
+    border-color: #78ffd6;
+}
+
+#owner-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 1.5rem;
+    width: 100%;
+}
+#owner-controls button {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+}
+
+.top-left-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    font-size: 0.85rem;
+    background: rgba(10, 10, 10, 0.5);
+    width: auto;
+}
+.top-right-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    font-size: 0.85rem;
+    background: rgba(10, 10, 10, 0.5);
+    width: auto;
+}
+
+.overlay-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 50;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+/* 4 & 5. Drawers (Config and Edit Profile) */
+.drawer {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 340px;
+    max-height: 95vh;
+    overflow-y: auto;
+    background: rgba(15, 15, 15, 0.7);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 2rem;
+    z-index: 20;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+    pointer-events: auto;
+}
+
+#config-panel {
+    right: -400px;
+    border-radius: 24px 0 0 24px;
+}
+#config-panel.open {
+    right: 0;
+}
+
+#edit-profile-panel {
+    left: -400px;
+    border-radius: 0 24px 24px 0;
+}
+#edit-profile-panel.open {
+    left: 0;
+}
+
+.drawer h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.drawer::-webkit-scrollbar { width: 6px; }
+.drawer::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
+.drawer::-webkit-scrollbar-thumb { background: rgba(120, 255, 214, 0.3); border-radius: 10px; }
+.drawer::-webkit-scrollbar-thumb:hover { background: rgba(120, 255, 214, 0.6); }
+
+/* Settings form styling */
+.setting-group { margin-bottom: 1.2rem; display: flex; flex-direction: column; }
+.setting-group label { font-size: 0.9rem; margin-bottom: 0.5rem; color: rgba(255, 255, 255, 0.8); display: flex; justify-content: space-between; }
+.setting-group label span { color: #78ffd6; font-weight: 600; }
+.setting-group input[type=range] { -webkit-appearance: none; width: 100%; background: rgba(255, 255, 255, 0.1); height: 6px; border-radius: 3px; outline: none; }
+.setting-group input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #78ffd6; cursor: pointer; box-shadow: 0 0 10px rgba(120, 255, 214, 0.5); transition: transform 0.1s; }
+.setting-group input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.checkbox-label { flex-direction: row !important; justify-content: flex-start !important; align-items: center; gap: 10px; cursor: pointer; }
+.advanced-settings { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.advanced-settings summary { cursor: pointer; font-size: 1.05rem; color: #78ffd6; margin-bottom: 0.5rem; outline: none; transition: color 0.3s; font-weight: 600; }
+.advanced-settings summary:hover { color: #a8ff78; }
